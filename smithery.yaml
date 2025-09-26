@@ -3,37 +3,44 @@ build:
   dockerfile: "Dockerfile"           # Path to your Dockerfile
   dockerBuildPath: "." 
 startCommand:
-  type: http
+  type: "http"
   configSchema:
-      type: object
-      properties:
-        default_proxy_url:
-          type: string
-          title: "Default Proxy URL"
-          description: "Default proxy server URL"
-          default: ""
-        default_proxy_login:
-          type: string
-          title: "Default Proxy Login"
-          description: "Default proxy server login username"
-          default: ""
-        default_proxy_password:
-          type: string
-          title: "Default Proxy Password"
-          description: "Default proxy server login password"
-          default: ""
-        unlocker_proxy_url:
-          type: string
-          title: "Unlocker Proxy URL"
-          description: "Unlocker proxy server URL"
-          default: ""
-        unlocker_proxy_login:
-          type: string
-          title: "Unlocker Proxy Login"
-          description: "Unlocker proxy server login username"
-          default: ""
-        unlocker_proxy_password:
-          type: string
-          title: "Unlocker Proxy Password"
-          description: "Unlocker proxy server login password"
-          default: ""
+    type: "object"
+    properties:
+      default_proxy_url:
+        type: "string"
+        title: "Default Proxy URL"
+        description: "Default proxy server URL"
+        default: ""
+      default_proxy_login:
+        type: "string"
+        title: "Default Proxy Login"
+        description: "Default proxy server login username"
+        default: ""
+      default_proxy_password:
+        type: "string"
+        title: "Default Proxy Password"
+        description: "Default proxy server login password"
+        default: ""
+      unlocker_proxy_url:
+        type: "string"
+        title: "Unlocker Proxy URL"
+        description: "Unlocker proxy server URL"
+        default: ""
+      unlocker_proxy_login:
+        type: "string"
+        title: "Unlocker Proxy Login"
+        description: "Unlocker proxy server login username"
+        default: ""
+      unlocker_proxy_password:
+        type: "string"
+        title: "Unlocker Proxy Password"
+        description: "Unlocker proxy server login password"
+        default: ""
+  exampleConfig:
+    default_proxy_url: "http://xxx.xxx.com:8080"
+    default_proxy_login: "username"
+    default_proxy_password: "password"
+    unlocker_proxy_url: "http://xxx-xxx.xxx.com:8080"
+    unlocker_proxy_login: "unlocker_user"
+    unlocker_proxy_password: "unlocker_pass"
