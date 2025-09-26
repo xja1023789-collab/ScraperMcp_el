@@ -13,6 +13,7 @@
 
 
 [![Licence](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![smithery badge](https://smithery.ai/badge/@xja1023789-collab/scrapermcp_el)](https://smithery.ai/badge/@xja1023789-collab/scrapermcp_el)
 
 <br/>
 
@@ -38,6 +39,15 @@ Thordata MCP provides the parse_with_ai_selectors tool, leveraging Thordata Web 
 Before deployment, please ensure you have:
 
 - **Thordata Web Scraper API Account**: Visit [thordata](https://www.thordata.com/) to obtain your exclusive username and password;
+
+## 📦 Installation
+### Installing via Smithery
+
+To install Thordata MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@xja1023789-collab/scrapermcp_el):
+
+```bash
+npx -y @smithery/cli install @xja1023789-collab/scrapermcp_el --client claude
+```
 
 ## 📦 Configuration
 
