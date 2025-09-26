@@ -5,35 +5,35 @@ build:
 startCommand:
   type: http
   configSchema:
-    type: object
-    properties:
-      default_proxy_url:
-        type: string
-        title: "Default Proxy URL"
-        description: "Default proxy server URL"
-        default: ""
-      default_proxy_login:
-        type: string
-        title: "Default Proxy Login"
-        description: "Default proxy server login username"
-        default: ""
-      default_proxy_password:
-        type: string
-        title: "Default Proxy Password"
-        description: "Default proxy server login password"
-        default: ""
-      unlocker_proxy_url:
-        type: string
-        title: "Unlocker Proxy URL"
-        description: "Unlocker proxy server URL"
-        default: ""
-      unlocker_proxy_login:
-        type: string
-        title: "Unlocker Proxy Login"
-        description: "Unlocker proxy server login username"
-        default: ""
-      unlocker_proxy_password:
-        type: string
-        title: "Unlocker Proxy Password"
-        description: "Unlocker proxy server login password"
-        default: ""
+      type: object
+      properties:
+        default_proxy_url:
+          type: string
+          title: "Default Proxy URL"
+          description: "Default proxy server URL"
+          default: ""
+        default_proxy_login:
+          type: string
+          title: "Default Proxy Login"
+          description: "Default proxy server login username"
+          default: ""
+        default_proxy_password:
+          type: string
+          title: "Default Proxy Password"
+          description: "Default proxy server login password"
+          default: ""
+        unlocker_proxy_url:
+          type: string
+          title: "Unlocker Proxy URL"
+          description: "Unlocker proxy server URL"
+          default: ""
+        unlocker_proxy_login:
+          type: string
+          title: "Unlocker Proxy Login"
+          description: "Unlocker proxy server login username"
+          default: ""
+        unlocker_proxy_password:
+          type: string
+          title: "Unlocker Proxy Password"
+          description: "Unlocker proxy server login password"
+          default: ""
