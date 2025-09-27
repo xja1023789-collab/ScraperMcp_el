@@ -16,24 +16,46 @@ from aiohttp import ClientTimeout
 from markdownify import markdownify
 from lxml.html import defs, fromstring, tostring
 from lxml.html.clean import Cleaner
-import os
 from datetime import datetime
 from pydantic import BaseModel, Field
 from smithery.decorators import smithery
 from smithery.utils.config import parse_config_from_query_string
 import params as params
-
+from middleware import SmitheryConfigMiddleware  # Import custom Smithery configuration middleware
 
 # Configuration data model - corresponds to fields in smithery.yaml
-class Config(BaseModel):
-    """Configuration model, corresponding to configuration fields in smithery.yaml"""
-    default_proxy_url: str = ""
-    default_proxy_login: str = ""
-    default_proxy_password: str = ""
-    unlocker_proxy_url: str = ""
-    unlocker_proxy_login: str = ""
-    unlocker_proxy_password: str = ""
+# class Config(BaseModel):
+#     """Configuration model, corresponding to configuration fields in smithery.yaml"""
+#     default_proxy_url: str = ""
+#     default_proxy_login: str = ""
+#     default_proxy_password: str = ""
+#     unlocker_proxy_url: str = ""
+#     unlocker_proxy_login: str = ""
+#     unlocker_proxy_password: str = ""
 
+def get_request_config() -> dict:
+    """Get complete configuration from current request context."""
+    try:
+        # Access current request context from FastMCP
+        import contextvars
+        
+        # Try to get from available request context
+        request = contextvars.copy_context().get('request')  # Get current request object
+        if hasattr(request, 'scope') and request.scope:  # Check if request has scope attribute
+            return request.scope.get('smithery_config', {})  # Return smithery configuration or empty dictionary
+    except:
+        pass  # If exception occurs, handle silently
+    
+    # If configuration not found, return empty dictionary
+    return {}
+
+def get_config_value(key: str, default=None):
+    """Get specific configuration value from current request."""
+    config = get_request_config()  # Get complete request configuration
+    # Handle case where configuration might be None
+    if config is None:
+        config = {}  # If configuration is None, set to empty dictionary
+    return config.get(key, default)  # Return value for specified key or default value
 
 """Create and return FastMCP server instance"""
 # Create FastMCP server instance
@@ -60,8 +82,7 @@ class ScrapeRetryException(Exception):
 async def parse_with_ai_selectors( 
                                     url: params.URL,
                                     render: params.RENDER, 
-                                    output_format: params.OUTPUT_FORMAT,
-                                    query_string: str
+                                    output_format: params.OUTPUT_FORMAT
                                     ) -> str:
     """
     Use proxy or unlocker to crawl and parse web pages
@@ -74,16 +95,21 @@ async def parse_with_ai_selectors(
     """
     
     try:
-        # Parse configuration parameters
-        config_dict = parse_config_from_query_string(query_string)
-        config = Config(**config_dict)  # Use Pydantic to validate configuration
+       
         # Get proxy configuration from session configuration
+        unlocker_proxy_url = get_config_value("unlocker_proxy_url") 
+        unlocker_proxy_login = get_config_value("unlocker_proxy_login") 
+        unlocker_proxy_password = get_config_value("unlocker_proxy_password") 
+        default_proxy_url = get_config_value("default_proxy_url") 
+        default_proxy_login = get_config_value("default_proxy_login") 
+        default_proxy_password = get_config_value("default_proxy_password") 
+        
         
         if render == "Unlocker":
             # Priority use unlocker proxy from smithery configuration
-            proxy_url = config.unlocker_proxy_url 
-            proxy_login = config.unlocker_proxy_login 
-            proxy_password = config.unlocker_proxy_password 
+            proxy_url = unlocker_proxy_url 
+            proxy_login = unlocker_proxy_login 
+            proxy_password = unlocker_proxy_password 
             
             thor_mcp_myProxyConfig = ProxyConfig(
                 proxy_url=proxy_url,
@@ -92,9 +118,9 @@ async def parse_with_ai_selectors(
             )
         else:
             # Priority use default proxy from smithery configuration
-            proxy_url = config.default_proxy_url 
-            proxy_login = config.default_proxy_login 
-            proxy_password = config.default_proxy_password 
+            proxy_url = default_proxy_url 
+            proxy_login = default_proxy_login 
+            proxy_password = default_proxy_password 
             
             thor_mcp_myProxyConfig = ProxyConfig(
                 proxy_url=proxy_url,
@@ -187,7 +213,7 @@ async def parse_with_ai_selectors(
     
     except Exception as e:
         # Catch other unexpected exceptions
-        raise ToolError(f"Unexpected error occurred while parsing web page,print :"+query_string)
+        raise ToolError(f"Unexpected error occurred while parsing web page")
 
 @retry(
         reraise=True,
@@ -451,6 +477,8 @@ if __name__ == "__main__":  # If current script is the main program entry
         expose_headers=["mcp-session-id", "mcp-protocol-version"],  # Allow client to read MCP session ID and protocol version headers
         max_age=86400,  # Preflight request cache time (seconds)
     )
+
+    app = SmitheryConfigMiddleware(app)  
 
     # Use PORT environment variable
     port = int(os.environ.get("PORT", 8081))  # Get port number from environment variable, default to 8081
