@@ -37,7 +37,7 @@ startCommand:
         title: "Unlocker Proxy Password"
         description: "Unlocker proxy server login password"
         default: ""
-    required: []    
+    required: []      
   exampleConfig:
     default_proxy_url: "http://xxx.xxx.com:8080"
     default_proxy_login: "username"
