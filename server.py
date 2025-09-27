@@ -94,102 +94,73 @@ async def parse_with_ai_selectors(
         
     """
     
-    try:
+    # try:
        
         # Get proxy configuration from session configuration
-        unlocker_proxy_url = get_config_value("unlocker_proxy_url") 
-        unlocker_proxy_login = get_config_value("unlocker_proxy_login") 
-        unlocker_proxy_password = get_config_value("unlocker_proxy_password") 
-        default_proxy_url = get_config_value("default_proxy_url") 
-        default_proxy_login = get_config_value("default_proxy_login") 
-        default_proxy_password = get_config_value("default_proxy_password") 
+    unlocker_proxy_url = get_config_value("unlocker_proxy_url") 
+    unlocker_proxy_login = get_config_value("unlocker_proxy_login") 
+    unlocker_proxy_password = get_config_value("unlocker_proxy_password") 
+    default_proxy_url = get_config_value("default_proxy_url") 
+    default_proxy_login = get_config_value("default_proxy_login") 
+    default_proxy_password = get_config_value("default_proxy_password") 
+    
+    
+    if render == "Unlocker":
+        # Priority use unlocker proxy from smithery configuration
+        proxy_url = unlocker_proxy_url 
+        proxy_login = unlocker_proxy_login 
+        proxy_password = unlocker_proxy_password 
         
+        thor_mcp_myProxyConfig = ProxyConfig(
+            proxy_url=proxy_url,
+            login=proxy_login,
+            password=proxy_password,
+        )
+    else:
+        # Priority use default proxy from smithery configuration
+        proxy_url = default_proxy_url 
+        proxy_login = default_proxy_login 
+        proxy_password = default_proxy_password 
         
-        if render == "Unlocker":
-            # Priority use unlocker proxy from smithery configuration
-            proxy_url = unlocker_proxy_url 
-            proxy_login = unlocker_proxy_login 
-            proxy_password = unlocker_proxy_password 
-            
-            thor_mcp_myProxyConfig = ProxyConfig(
-                proxy_url=proxy_url,
-                login=proxy_login,
-                password=proxy_password,
-            )
-        else:
-            # Priority use default proxy from smithery configuration
-            proxy_url = default_proxy_url 
-            proxy_login = default_proxy_login 
-            proxy_password = default_proxy_password 
-            
-            thor_mcp_myProxyConfig = ProxyConfig(
-                proxy_url=proxy_url,
-                login=proxy_login,
-                password=proxy_password,
-            )
-        
-        # Verify proxy configuration parameters cannot be empty
-        if not thor_mcp_myProxyConfig.proxy_url or not thor_mcp_myProxyConfig.login or not thor_mcp_myProxyConfig.password:
-            raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable")
-        
-        thor_mcp_html = ""
-        thor_mcp_isCatch=False # Default cache disabled, cache is only for debugging use, as feedback on AI is unstable
-        if thor_mcp_isCatch:
-            # First check if there is an HTML file for today
-            thor_mcp_today = datetime.now().strftime("%Y%m%d")
-            thor_mcp_save_dir = "html_snapshots"
-            os.makedirs(thor_mcp_save_dir, exist_ok=True)
-            # Clean special characters from URL and limit filename length
-            thor_mcp_clean_url = url.split("//")[-1]
-            for char in [
-                "?", ",", "/", "\\", ":", "*", '"', "<", ">", "|", 
-                "%", "=", "&", "+", ";", "@", "#", "$", "^", "`", 
-                "{", "}", "[", "]", "'",
-            ]:
-                thor_mcp_clean_url = thor_mcp_clean_url.replace(char, "_")
-            # Limit total filename length to 200 characters
-            thor_mcp_max_length = 200 - len(thor_mcp_today) - 1  # Subtract date and separator length
-            thor_mcp_htmlName = f"{thor_mcp_today}_{thor_mcp_clean_url[:thor_mcp_max_length]}"
-            thor_mcp_filename = f"{thor_mcp_save_dir}/{thor_mcp_htmlName}.html"
+        thor_mcp_myProxyConfig = ProxyConfig(
+            proxy_url=proxy_url,
+            login=proxy_login,
+            password=proxy_password,
+        )
+    
+    # Verify proxy configuration parameters cannot be empty
+    if not thor_mcp_myProxyConfig.proxy_url or not thor_mcp_myProxyConfig.login or not thor_mcp_myProxyConfig.password:
+        raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable;unlocker_proxy_url:{unlocker_proxy_url};unlocker_proxy_login:{unlocker_proxy_login};unlocker_proxy_password:{unlocker_proxy_password};default_proxy_url:{default_proxy_url};default_proxy_login:{default_proxy_login};default_proxy_password:{default_proxy_password}")
+    
+    thor_mcp_html = ""
+    thor_mcp_isCatch=False # Default cache disabled, cache is only for debugging use, as feedback on AI is unstable
+    if thor_mcp_isCatch:
+        # First check if there is an HTML file for today
+        thor_mcp_today = datetime.now().strftime("%Y%m%d")
+        thor_mcp_save_dir = "html_snapshots"
+        os.makedirs(thor_mcp_save_dir, exist_ok=True)
+        # Clean special characters from URL and limit filename length
+        thor_mcp_clean_url = url.split("//")[-1]
+        for char in [
+            "?", ",", "/", "\\", ":", "*", '"', "<", ">", "|", 
+            "%", "=", "&", "+", ";", "@", "#", "$", "^", "`", 
+            "{", "}", "[", "]", "'",
+        ]:
+            thor_mcp_clean_url = thor_mcp_clean_url.replace(char, "_")
+        # Limit total filename length to 200 characters
+        thor_mcp_max_length = 200 - len(thor_mcp_today) - 1  # Subtract date and separator length
+        thor_mcp_htmlName = f"{thor_mcp_today}_{thor_mcp_clean_url[:thor_mcp_max_length]}"
+        thor_mcp_filename = f"{thor_mcp_save_dir}/{thor_mcp_htmlName}.html"
 
-            if os.path.exists(thor_mcp_filename):
-                try:
-                    with open(thor_mcp_filename, "r", encoding="utf-8") as f:
-                        thor_mcp_html = f.read()
-                    print(f"Read HTML from local cache: {thor_mcp_filename}")
-                except IOError as e:
-                    raise ToolError(f"Failed to read cache file")
-
-            else:
-                thor_mcp_html = await scrape(url, thor_mcp_myProxyConfig)
-                if not thor_mcp_html:
-                    raise ToolError(f"Web scraping failed, unable to get content")
-                
-                try:
-                    with open(thor_mcp_filename, "w", encoding="utf-8") as f:
-                        f.write(thor_mcp_html)
-                    print(f"HTML saved to {thor_mcp_filename}")
-                except IOError as e:
-                    raise ToolError(f"Failed to save HTML file")
+        if os.path.exists(thor_mcp_filename):
+            try:
+                with open(thor_mcp_filename, "r", encoding="utf-8") as f:
+                    thor_mcp_html = f.read()
+                print(f"Read HTML from local cache: {thor_mcp_filename}")
+            except IOError as e:
+                raise ToolError(f"Failed to read cache file")
 
         else:
-            # When cache is disabled, still save HTML but use different directory and second-level timestamp filename
-            thor_mcp_now = datetime.now().strftime("%Y%m%d%H%M%S")
-            thor_mcp_save_dir = "html_temp"
-            os.makedirs(thor_mcp_save_dir, exist_ok=True)
-            # Clean special characters from URL and limit filename length
-            thor_mcp_clean_url = url.split("//")[-1]
-            for char in [
-                "?", ",", "/", "\\", ":", "*", '"', "<", ">", "|", 
-                "%", "=", "&", "+", ";", "@", "#", "$", "^", "`", 
-                "{", "}", "[", "]", "'",
-            ]:
-                thor_mcp_clean_url = thor_mcp_clean_url.replace(char, "_")
-            # Limit total filename length to 200 characters
-            thor_mcp_max_length = 200 - len(thor_mcp_now) - 1  # Subtract timestamp and separator length
-            thor_mcp_htmlName = f"{thor_mcp_now}_{thor_mcp_clean_url[:thor_mcp_max_length]}"
-            thor_mcp_filename = f"{thor_mcp_save_dir}/{thor_mcp_htmlName}.html"
-
             thor_mcp_html = await scrape(url, thor_mcp_myProxyConfig)
             if not thor_mcp_html:
                 raise ToolError(f"Web scraping failed, unable to get content")
@@ -197,23 +168,52 @@ async def parse_with_ai_selectors(
             try:
                 with open(thor_mcp_filename, "w", encoding="utf-8") as f:
                     f.write(thor_mcp_html)
-                print(f"HTML temporarily saved to {thor_mcp_filename}")
+                print(f"HTML saved to {thor_mcp_filename}")
             except IOError as e:
-                raise ToolError(f"Failed to save temporary HTML file")
+                raise ToolError(f"Failed to save HTML file")
+
+    else:
+        # When cache is disabled, still save HTML but use different directory and second-level timestamp filename
+        thor_mcp_now = datetime.now().strftime("%Y%m%d%H%M%S")
+        thor_mcp_save_dir = "html_temp"
+        os.makedirs(thor_mcp_save_dir, exist_ok=True)
+        # Clean special characters from URL and limit filename length
+        thor_mcp_clean_url = url.split("//")[-1]
+        for char in [
+            "?", ",", "/", "\\", ":", "*", '"', "<", ">", "|", 
+            "%", "=", "&", "+", ";", "@", "#", "$", "^", "`", 
+            "{", "}", "[", "]", "'",
+        ]:
+            thor_mcp_clean_url = thor_mcp_clean_url.replace(char, "_")
+        # Limit total filename length to 200 characters
+        thor_mcp_max_length = 200 - len(thor_mcp_now) - 1  # Subtract timestamp and separator length
+        thor_mcp_htmlName = f"{thor_mcp_now}_{thor_mcp_clean_url[:thor_mcp_max_length]}"
+        thor_mcp_filename = f"{thor_mcp_save_dir}/{thor_mcp_htmlName}.html"
+
+        thor_mcp_html = await scrape(url, thor_mcp_myProxyConfig)
+        if not thor_mcp_html:
+            raise ToolError(f"Web scraping failed, unable to get content")
         
-        # Process content and return result
         try:
-            thor_mcp_result = get_content(thor_mcp_html, output_format)
-            if not thor_mcp_result:
-                raise ToolError(f"Content processing failed: Unable to convert content to {output_format} format")
-            return thor_mcp_result
-        except Exception as e:
-            raise ToolError(f"Error occurred during content processing")
+            with open(thor_mcp_filename, "w", encoding="utf-8") as f:
+                f.write(thor_mcp_html)
+            print(f"HTML temporarily saved to {thor_mcp_filename}")
+        except IOError as e:
+            raise ToolError(f"Failed to save temporary HTML file")
     
-    
+    # Process content and return result
+    try:
+        thor_mcp_result = get_content(thor_mcp_html, output_format)
+        if not thor_mcp_result:
+            raise ToolError(f"Content processing failed: Unable to convert content to {output_format} format")
+        return thor_mcp_result
     except Exception as e:
-        # Catch other unexpected exceptions
-        raise ToolError(f"Unexpected error occurred while parsing web page")
+        raise ToolError(f"Error occurred during content processing")
+    
+    
+    # except Exception as e:
+    #     # Catch other unexpected exceptions
+    #     raise ToolError(f"Unexpected error occurred while parsing web page")
 
 @retry(
         reraise=True,
