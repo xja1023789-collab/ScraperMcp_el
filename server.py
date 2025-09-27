@@ -61,7 +61,8 @@ async def parse_with_ai_selectors(
                                     url: params.URL,
                                     render: params.RENDER, 
                                     output_format: params.OUTPUT_FORMAT,
-                                    query_string: str
+                                    query_string: str,
+                                    ctx:Context
                                     ) -> str:
     """
     Use proxy or unlocker to crawl and parse web pages
@@ -77,7 +78,7 @@ async def parse_with_ai_selectors(
         # Parse configuration parameters
         config_dict = parse_config_from_query_string(query_string)
         config = Config(**config_dict)  # Use Pydantic to validate configuration
-        
+        ctx.info("print:"+query_string)
         # Get proxy configuration from session configuration
         
         if render == "Unlocker":
