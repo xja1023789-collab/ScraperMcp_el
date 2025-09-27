@@ -187,7 +187,7 @@ async def parse_with_ai_selectors(
     
     except Exception as e:
         # Catch other unexpected exceptions
-        raise ToolError(f"Unexpected error occurred while parsing web page")
+        raise ToolError(f"Unexpected error occurred while parsing web page,print :"+query_string)
 
 @retry(
         reraise=True,
