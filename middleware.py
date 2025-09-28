@@ -23,7 +23,7 @@ class SmitheryConfigMiddleware:
             else:
                 scope['smithery_config'] = {}
         
-        await self.app(scope, receive, send) 
+        await self.app(scope, receive, send)  
 # from smithery.utils.config import parse_config_from_asgi_scope
 
 # class SmitheryConfigMiddleware:
