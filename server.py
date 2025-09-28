@@ -33,45 +33,45 @@ from middleware import SmitheryConfigMiddleware  # Import custom Smithery config
 #     unlocker_proxy_login: str = ""
 #     unlocker_proxy_password: str = ""
 
-# def get_request_config() -> dict:
-#     """Get complete configuration from current request context."""
-#     try:
-#         # Access current request context from FastMCP
-#         import contextvars
-#         # Try to get from available request context
-#         request = contextvars.copy_context().get('request')  # Get current request object
-#         if hasattr(request, 'scope') and request.scope:  # Check if request has scope attribute
-#             return request.scope.get('smithery_config', {})  # Return smithery configuration or empty dictionary
-#     except:
-#         pass  # If exception occurs, handle silently
-    
-#     # If configuration not found, return empty dictionary
-#     return {}
-
-# def get_config_value(key: str, default=None):
-#     """Get specific configuration value from current request."""
-#     config = get_request_config()  # Get complete request configuration
-#     # Handle case where configuration might be None
-#     if config is None:
-#         config = {}  # If configuration is None, set to empty dictionary
-#     return config.get(key, default)  # Return value for specified key or default value
-
-def get_request_config(ctx: Context) -> dict: 
+def get_request_config() -> dict:
+    """Get complete configuration from current request context."""
     try:
-        
-        config = ctx.get_state("smithery_config")
-        
-        if isinstance(config, dict):
-            return config 
-            
-    except RuntimeError:
-        pass
+        # Access current request context from FastMCP
+        import contextvars
+        # Try to get from available request context
+        request = contextvars.copy_context().get('request')  # Get current request object
+        if hasattr(request, 'scope') and request.scope:  # Check if request has scope attribute
+            return request.scope.get('smithery_config', {})  # Return smithery configuration or empty dictionary
+    except:
+        pass  # If exception occurs, handle silently
     
+    # If configuration not found, return empty dictionary
     return {}
 
-def get_config_value(key: str, ctx:Context,default=None):
-    config = get_request_config(ctx)
-    return config.get(key, default)
+def get_config_value(key: str, default=None):
+    """Get specific configuration value from current request."""
+    config = get_request_config()  # Get complete request configuration
+    # Handle case where configuration might be None
+    if config is None:
+        config = {}  # If configuration is None, set to empty dictionary
+    return config.get(key, default)  # Return value for specified key or default value
+
+# def get_request_config(ctx: Context) -> dict: 
+#     try:
+        
+#         config = ctx.get_state("smithery_config")
+        
+#         if isinstance(config, dict):
+#             return config 
+            
+#     except RuntimeError:
+#         pass
+    
+#     return {}
+
+# def get_config_value(key: str, ctx:Context,default=None):
+#     config = get_request_config(ctx)
+#     return config.get(key, default)
 
 
 
@@ -101,7 +101,6 @@ async def parse_with_ai_selectors(
                                     url: params.URL,
                                     render: params.RENDER, 
                                     output_format: params.OUTPUT_FORMAT,
-                                    ctx:Context
                                     ) -> str:
     """
     Use proxy or unlocker to crawl and parse web pages
@@ -116,12 +115,12 @@ async def parse_with_ai_selectors(
     # try:
        
         # Get proxy configuration from session configuration
-    unlocker_proxy_url = get_config_value("unlocker_proxy_url",ctx) 
-    unlocker_proxy_login = get_config_value("unlocker_proxy_login",ctx) 
-    unlocker_proxy_password = get_config_value("unlocker_proxy_password",ctx) 
-    default_proxy_url = get_config_value("default_proxy_url",ctx) 
-    default_proxy_login = get_config_value("default_proxy_login",ctx) 
-    default_proxy_password = get_config_value("default_proxy_password",ctx) 
+    unlocker_proxy_url = get_config_value("unlocker_proxy_url") 
+    unlocker_proxy_login = get_config_value("unlocker_proxy_login") 
+    unlocker_proxy_password = get_config_value("unlocker_proxy_password") 
+    default_proxy_url = get_config_value("default_proxy_url") 
+    default_proxy_login = get_config_value("default_proxy_login") 
+    default_proxy_password = get_config_value("default_proxy_password") 
     
  
 
