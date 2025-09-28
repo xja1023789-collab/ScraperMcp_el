@@ -104,7 +104,13 @@ async def parse_with_ai_selectors(
     default_proxy_login = get_config_value("default_proxy_login") 
     default_proxy_password = get_config_value("default_proxy_password") 
     
-    
+    print(f"unlocker_proxy_url: {unlocker_proxy_url}")
+    print(f"unlocker_proxy_login: {unlocker_proxy_login}")
+    print(f"unlocker_proxy_password: {unlocker_proxy_password}")
+    print(f"default_proxy_url: {default_proxy_url}")
+    print(f"default_proxy_login: {default_proxy_login}")
+    print(f"default_proxy_password: {default_proxy_password}")
+
     if render == "Unlocker":
         # Priority use unlocker proxy from smithery configuration
         proxy_url = unlocker_proxy_url 
@@ -130,7 +136,7 @@ async def parse_with_ai_selectors(
     
     # Verify proxy configuration parameters cannot be empty
     if not thor_mcp_myProxyConfig.proxy_url or not thor_mcp_myProxyConfig.login or not thor_mcp_myProxyConfig.password:
-        raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable;unlocker_proxy_url:{unlocker_proxy_url};unlocker_proxy_login:{unlocker_proxy_login};unlocker_proxy_password:{unlocker_proxy_password};default_proxy_url:{default_proxy_url};default_proxy_login:{default_proxy_login};default_proxy_password:{default_proxy_password}")
+        raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable")
     
     thor_mcp_html = ""
     thor_mcp_isCatch=False # Default cache disabled, cache is only for debugging use, as feedback on AI is unstable

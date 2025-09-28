@@ -9,11 +9,13 @@ class SmitheryConfigMiddleware:
     async def __call__(self, scope, receive, send):
         if scope.get('type') == 'http':
             query = scope.get('query_string', b'').decode()
+            print(f"query: {query}")
             
             if 'config=' in query:
                 try:
                     config_b64 = unquote(parse_qs(query)['config'][0])
                     config = json.loads(base64.b64decode(config_b64))
+                    print(f"config: {config}")
                     
                     # Inject full config into request scope for per-request access
                     scope['smithery_config'] = config
