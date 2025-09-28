@@ -56,7 +56,7 @@ from middleware import SmitheryConfigMiddleware  # Import custom Smithery config
 #         config = {}  # If configuration is None, set to empty dictionary
 #     return config.get(key, default)  # Return value for specified key or default value
 
-def get_request_config(ctx: Context) -> dict:
+def get_request_config(ctx: Context) -> dict: 
     try:
         
         config = ctx.get_state("smithery_config")
