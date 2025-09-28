@@ -58,6 +58,7 @@ from middleware import SmitheryConfigMiddleware  # Import custom Smithery config
 
 def get_request_config(ctx: Context) -> dict:
     try:
+        
         config = ctx.get_state("smithery_config")
         
         if isinstance(config, dict):
@@ -68,8 +69,8 @@ def get_request_config(ctx: Context) -> dict:
     
     return {}
 
-def get_config_value(key: str, default=None):
-    config = get_request_config()
+def get_config_value(key: str, ctx:Context,default=None):
+    config = get_request_config(ctx)
     return config.get(key, default)
 
 
@@ -100,7 +101,7 @@ async def parse_with_ai_selectors(
                                     url: params.URL,
                                     render: params.RENDER, 
                                     output_format: params.OUTPUT_FORMAT,
-                                    cx:Context
+                                    ctx:Context
                                     ) -> str:
     """
     Use proxy or unlocker to crawl and parse web pages
@@ -115,12 +116,12 @@ async def parse_with_ai_selectors(
     # try:
        
         # Get proxy configuration from session configuration
-    unlocker_proxy_url = get_config_value("unlocker_proxy_url") 
-    unlocker_proxy_login = get_config_value("unlocker_proxy_login") 
-    unlocker_proxy_password = get_config_value("unlocker_proxy_password") 
-    default_proxy_url = get_config_value("default_proxy_url") 
-    default_proxy_login = get_config_value("default_proxy_login") 
-    default_proxy_password = get_config_value("default_proxy_password") 
+    unlocker_proxy_url = get_config_value("unlocker_proxy_url",ctx) 
+    unlocker_proxy_login = get_config_value("unlocker_proxy_login",ctx) 
+    unlocker_proxy_password = get_config_value("unlocker_proxy_password",ctx) 
+    default_proxy_url = get_config_value("default_proxy_url",ctx) 
+    default_proxy_login = get_config_value("default_proxy_login",ctx) 
+    default_proxy_password = get_config_value("default_proxy_password",ctx) 
     
  
 
