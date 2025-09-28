@@ -82,7 +82,8 @@ class ScrapeRetryException(Exception):
 async def parse_with_ai_selectors( 
                                     url: params.URL,
                                     render: params.RENDER, 
-                                    output_format: params.OUTPUT_FORMAT
+                                    output_format: params.OUTPUT_FORMAT,
+                                    cx:Context
                                     ) -> str:
     """
     Use proxy or unlocker to crawl and parse web pages
@@ -104,12 +105,12 @@ async def parse_with_ai_selectors(
     default_proxy_login = get_config_value("default_proxy_login") 
     default_proxy_password = get_config_value("default_proxy_password") 
     
-    print(f"unlocker_proxy_url: {unlocker_proxy_url}")
-    print(f"unlocker_proxy_login: {unlocker_proxy_login}")
-    print(f"unlocker_proxy_password: {unlocker_proxy_password}")
-    print(f"default_proxy_url: {default_proxy_url}")
-    print(f"default_proxy_login: {default_proxy_login}")
-    print(f"default_proxy_password: {default_proxy_password}")
+    cx.info(f"unlocker_proxy_url: {unlocker_proxy_url}")
+    cx.info(f"unlocker_proxy_login: {unlocker_proxy_login}")
+    cx.info(f"unlocker_proxy_password: {unlocker_proxy_password}")
+    cx.info(f"default_proxy_url: {default_proxy_url}")
+    cx.info(f"default_proxy_login: {default_proxy_login}")
+    cx.info(f"default_proxy_password: {default_proxy_password}")
 
     if render == "Unlocker":
         # Priority use unlocker proxy from smithery configuration
