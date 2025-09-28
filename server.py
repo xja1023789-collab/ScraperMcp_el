@@ -105,13 +105,14 @@ async def parse_with_ai_selectors(
     default_proxy_login = get_config_value("default_proxy_login") 
     default_proxy_password = get_config_value("default_proxy_password") 
     
-    cx.info(f"unlocker_proxy_url: {unlocker_proxy_url}")
-    cx.info(f"unlocker_proxy_login: {unlocker_proxy_login}")
-    cx.info(f"unlocker_proxy_password: {unlocker_proxy_password}")
-    cx.info(f"default_proxy_url: {default_proxy_url}")
-    cx.info(f"default_proxy_login: {default_proxy_login}")
-    cx.info(f"default_proxy_password: {default_proxy_password}")
+    cx.info(f"unlocker_proxy_urlCs: {unlocker_proxy_url}")
+    cx.info(f"unlocker_proxy_loginCs: {unlocker_proxy_login}")
+    cx.info(f"unlocker_proxy_passwordCs: {unlocker_proxy_password}")
+    cx.info(f"default_proxy_urlCs: {default_proxy_url}")
+    cx.info(f"default_proxy_loginCs: {default_proxy_login}")
+    cx.info(f"default_proxy_passwordCs: {default_proxy_password}")
 
+    
     if render == "Unlocker":
         # Priority use unlocker proxy from smithery configuration
         proxy_url = unlocker_proxy_url 
