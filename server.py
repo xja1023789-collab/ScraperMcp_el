@@ -33,34 +33,46 @@ from middleware import SmitheryConfigMiddleware  # Import custom Smithery config
 #     unlocker_proxy_login: str = ""
 #     unlocker_proxy_password: str = ""
 
-def get_request_config() -> dict:
-    """Get complete configuration from current request context."""
-    try:
-        # Access current request context from FastMCP
-        import contextvars
-        
-        # Try to get from available request context
-        request = contextvars.copy_context().get('request')  # Get current request object
-        print(f"requestCs3: {request}")
-        if hasattr(request, 'scope') and request.scope:  # Check if request has scope attribute
-            return request.scope.get('smithery_config', {})  # Return smithery configuration or empty dictionary
-    except:
-        pass  # If exception occurs, handle silently
+# def get_request_config() -> dict:
+#     """Get complete configuration from current request context."""
+#     try:
+#         # Access current request context from FastMCP
+#         import contextvars
+#         # Try to get from available request context
+#         request = contextvars.copy_context().get('request')  # Get current request object
+#         if hasattr(request, 'scope') and request.scope:  # Check if request has scope attribute
+#             return request.scope.get('smithery_config', {})  # Return smithery configuration or empty dictionary
+#     except:
+#         pass  # If exception occurs, handle silently
     
-    # If configuration not found, return empty dictionary
+#     # If configuration not found, return empty dictionary
+#     return {}
+
+# def get_config_value(key: str, default=None):
+#     """Get specific configuration value from current request."""
+#     config = get_request_config()  # Get complete request configuration
+#     # Handle case where configuration might be None
+#     if config is None:
+#         config = {}  # If configuration is None, set to empty dictionary
+#     return config.get(key, default)  # Return value for specified key or default value
+
+def get_request_config(ctx: Context) -> dict:
+    try:
+        config = ctx.get_state("smithery_config")
+        
+        if isinstance(config, dict):
+            return config
+            
+    except RuntimeError:
+        pass
+    
     return {}
 
 def get_config_value(key: str, default=None):
-    """Get specific configuration value from current request."""
-    config = get_request_config()  # Get complete request configuration
-    print(f"configCs4: {config}")
-    
-    # Handle case where configuration might be None
-    if config is None:
-        config = {}  # If configuration is None, set to empty dictionary
-    print(f"configCs5: {config.get(key, default)}")
-        
-    return config.get(key, default)  # Return value for specified key or default value
+    config = get_request_config()
+    return config.get(key, default)
+
+
 
 """Create and return FastMCP server instance"""
 # Create FastMCP server instance
@@ -110,12 +122,7 @@ async def parse_with_ai_selectors(
     default_proxy_login = get_config_value("default_proxy_login") 
     default_proxy_password = get_config_value("default_proxy_password") 
     
-    print(f"unlocker_proxy_urlCs: {unlocker_proxy_url}")
-    print(f"unlocker_proxy_loginCs: {unlocker_proxy_login}")
-    print(f"unlocker_proxy_passwordCs: {unlocker_proxy_password}")
-    print(f"default_proxy_urlCs: {default_proxy_url}")
-    print(f"default_proxy_loginCs: {default_proxy_login}")
-    print(f"default_proxy_passwordCs: {default_proxy_password}")
+ 
 
     
     if render == "Unlocker":
@@ -143,8 +150,9 @@ async def parse_with_ai_selectors(
     
     # Verify proxy configuration parameters cannot be empty
     if not thor_mcp_myProxyConfig.proxy_url or not thor_mcp_myProxyConfig.login or not thor_mcp_myProxyConfig.password:
-        raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable")
-    
+        # raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable")
+        raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable;unlocker_proxy_url:{unlocker_proxy_url};unlocker_proxy_login:{unlocker_proxy_login};unlocker_proxy_password:{unlocker_proxy_password};default_proxy_url:{default_proxy_url};default_proxy_login:{default_proxy_login};default_proxy_password:{default_proxy_password}")
+        
     thor_mcp_html = ""
     thor_mcp_isCatch=False # Default cache disabled, cache is only for debugging use, as feedback on AI is unstable
     if thor_mcp_isCatch:
