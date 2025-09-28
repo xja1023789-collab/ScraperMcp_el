@@ -1116,7 +1116,7 @@ requires-dist = [
     { name = "lxml-html-clean", specifier = ">=0.4.1" },
     { name = "markdownify", specifier = ">=0.14.1" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.2.0" },
-    { name = "smithery", specifier = ">=0.1.23" },
+    { name = "smithery", specifier = ">=0.4.2" },
     { name = "tenacity", specifier = ">=8.2.0" },
 ]
 
@@ -1140,17 +1140,19 @@ wheels = [
 
 [[package]]
 name = "smithery"
-version = "0.2.4"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "art" },
-    { name = "mcp" },
+    { name = "pydantic" },
+    { name = "starlette" },
     { name = "toml" },
     { name = "typer" },
+    { name = "uvicorn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/aa/33/d8002713e82096cdc60acc1e3ece3c4ec5b7a031139bb4642c0b3dfeeb13/smithery-0.2.4.tar.gz", hash = "sha256:0f2b0d336894a7a6b7972d5cebd8555650357992b72af62e06adb4cb74e9b2ee", size = 15965, upload-time = "2025-09-19T08:16:41.658Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/00/46/f9819fb75d745d24e70098546fcd3b3122be077db304fa1f998fdf63c4eb/smithery-0.4.2.tar.gz", hash = "sha256:f45a3abbbfc58409b251970508d2e69ae97464211aac2ba9b7c7f1a2e3353b95", size = 17229, upload-time = "2025-09-26T15:39:36.071Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/7f/3a2c124061724ec32bb107ab0fccc345b75b7e452d0dba29a9627f9e5a15/smithery-0.2.4-py3-none-any.whl", hash = "sha256:8050dea4613476cc91f7a8efebd441b3bb105d8c5badf6f980f5fd411c439f62", size = 22617, upload-time = "2025-09-19T08:16:40.553Z" },
+    { url = "https://files.pythonhosted.org/packages/73/9e/3284671cf470392109cfd45b39898ff488be461a90eb000696fb31751e7a/smithery-0.4.2-py3-none-any.whl", hash = "sha256:032905def7e8b0e695d88a518cbd1091cffa1aaf721d8aeb6846df9603a9e35a", size = 25190, upload-time = "2025-09-26T15:39:34.939Z" },
 ]
 
 [[package]]
