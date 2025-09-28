@@ -41,6 +41,7 @@ def get_request_config() -> dict:
         
         # Try to get from available request context
         request = contextvars.copy_context().get('request')  # Get current request object
+        print(f"requestCs3: {request}")
         if hasattr(request, 'scope') and request.scope:  # Check if request has scope attribute
             return request.scope.get('smithery_config', {})  # Return smithery configuration or empty dictionary
     except:
@@ -52,9 +53,13 @@ def get_request_config() -> dict:
 def get_config_value(key: str, default=None):
     """Get specific configuration value from current request."""
     config = get_request_config()  # Get complete request configuration
+    print(f"configCs4: {config}")
+    
     # Handle case where configuration might be None
     if config is None:
         config = {}  # If configuration is None, set to empty dictionary
+    print(f"configCs5: {config.get(key, default)}")
+        
     return config.get(key, default)  # Return value for specified key or default value
 
 """Create and return FastMCP server instance"""
@@ -105,12 +110,12 @@ async def parse_with_ai_selectors(
     default_proxy_login = get_config_value("default_proxy_login") 
     default_proxy_password = get_config_value("default_proxy_password") 
     
-    cx.info(f"unlocker_proxy_urlCs: {unlocker_proxy_url}")
-    cx.info(f"unlocker_proxy_loginCs: {unlocker_proxy_login}")
-    cx.info(f"unlocker_proxy_passwordCs: {unlocker_proxy_password}")
-    cx.info(f"default_proxy_urlCs: {default_proxy_url}")
-    cx.info(f"default_proxy_loginCs: {default_proxy_login}")
-    cx.info(f"default_proxy_passwordCs: {default_proxy_password}")
+    print(f"unlocker_proxy_urlCs: {unlocker_proxy_url}")
+    print(f"unlocker_proxy_loginCs: {unlocker_proxy_login}")
+    print(f"unlocker_proxy_passwordCs: {unlocker_proxy_password}")
+    print(f"default_proxy_urlCs: {default_proxy_url}")
+    print(f"default_proxy_loginCs: {default_proxy_login}")
+    print(f"default_proxy_passwordCs: {default_proxy_password}")
 
     
     if render == "Unlocker":
