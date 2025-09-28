@@ -62,7 +62,7 @@ def get_request_config(ctx: Context) -> dict:
         config = ctx.get_state("smithery_config")
         
         if isinstance(config, dict):
-            return config
+            return config 
             
     except RuntimeError:
         pass
