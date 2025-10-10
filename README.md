@@ -13,6 +13,7 @@
 
 
 [![Licence](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![smithery badge](https://smithery.ai/badge/@xja1023789-collab/scrapermcp_el)](https://smithery.ai/server/@xja1023789-collab/scrapermcp_el)
 
 <br/>
 
@@ -40,6 +41,14 @@ Before deployment, please ensure you have:
 - **Thordata Web Scraper API Account**: Visit [thordata](https://www.thordata.com/) to obtain your exclusive username and password;
 
 ## 📦 Configuration
+
+### Installing via Smithery
+
+To install scrapermcp_el automatically via [Smithery](https://smithery.ai/server/@xja1023789-collab/scrapermcp_el):
+
+```bash
+npx -y @smithery/cli install @xja1023789-collab/scrapermcp_el
+```
 
 ### Environment Variables
 
