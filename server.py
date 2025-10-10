@@ -23,57 +23,14 @@ from smithery.utils.config import parse_config_from_query_string
 import params as params
 from middleware import SmitheryConfigMiddleware  # Import custom Smithery configuration middleware
 
-# Configuration data model - corresponds to fields in smithery.yaml
-# class Config(BaseModel):
-#     """Configuration model, corresponding to configuration fields in smithery.yaml"""
-#     default_proxy_url: str = ""
-#     default_proxy_login: str = ""
-#     default_proxy_password: str = ""
-#     unlocker_proxy_url: str = ""
-#     unlocker_proxy_login: str = ""
-#     unlocker_proxy_password: str = ""
 
-def get_request_config() -> dict:
-    """Get complete configuration from current request context."""
-    try:
-        # Access current request context from FastMCP
-        import contextvars
-        # Try to get from available request context
-        request = contextvars.copy_context().get('request')  # Get current request object
-        if hasattr(request, 'scope') and request.scope:  # Check if request has scope attribute
-            return request.scope.get('smithery_config', {})  # Return smithery configuration or empty dictionary
-    except:
-        pass  # If exception occurs, handle silently
-    
-    # If configuration not found, return empty dictionary
-    return {}
+from typing import Optional
 
-def get_config_value(key: str, default=None):
-    """Get specific configuration value from current request."""
-    config = get_request_config()  # Get complete request configuration
-    # Handle case where configuration might be None
-    if config is None:
-        config = {}  # If configuration is None, set to empty dictionary
-    return config.get(key, default)  # Return value for specified key or default value
+current_config: Optional[dict] = None
 
-# def get_request_config(ctx: Context) -> dict: 
-#     try:
-        
-#         config = ctx.get_state("smithery_config")
-        
-#         if isinstance(config, dict):
-#             return config 
-            
-#     except RuntimeError:
-#         pass
-    
-#     return {}
-
-# def get_config_value(key: str, ctx:Context,default=None):
-#     config = get_request_config(ctx)
-#     return config.get(key, default)
-
-
+def set_api_key(config: dict) -> None:
+    global current_config
+    current_config = config
 
 """Create and return FastMCP server instance"""
 # Create FastMCP server instance
@@ -83,6 +40,7 @@ mcp = FastMCP(
         The parse_with_ai_selectors method uses proxy or unlocker to crawl and parse web pages according to user needs, with output format options: "html", "links", "Markdown"
     """
 )
+
 
 @dataclass
 class ProxyConfig:
@@ -112,15 +70,25 @@ async def parse_with_ai_selectors(
         
     """
     
+    
+    print("current_config:", current_config)
     # try:
        
         # Get proxy configuration from session configuration
-    unlocker_proxy_url = get_config_value("unlocker_proxy_url") 
-    unlocker_proxy_login = get_config_value("unlocker_proxy_login") 
-    unlocker_proxy_password = get_config_value("unlocker_proxy_password") 
-    default_proxy_url = get_config_value("default_proxy_url") 
-    default_proxy_login = get_config_value("default_proxy_login") 
-    default_proxy_password = get_config_value("default_proxy_password") 
+    if current_config is None:
+        unlocker_proxy_url = None
+        unlocker_proxy_login = None
+        unlocker_proxy_password = None
+        default_proxy_url = None
+        default_proxy_login = None
+        default_proxy_password = None
+    else:
+        unlocker_proxy_url = current_config.get("unlocker_proxy_url")
+        unlocker_proxy_login = current_config.get("unlocker_proxy_login")
+        unlocker_proxy_password = current_config.get("unlocker_proxy_password")
+        default_proxy_url = current_config.get("default_proxy_url")
+        default_proxy_login = current_config.get("default_proxy_login")
+        default_proxy_password = current_config.get("default_proxy_password")
     
  
 
@@ -150,9 +118,7 @@ async def parse_with_ai_selectors(
     
     # Verify proxy configuration parameters cannot be empty
     if not thor_mcp_myProxyConfig.proxy_url or not thor_mcp_myProxyConfig.login or not thor_mcp_myProxyConfig.password:
-        # raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable")
-        raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable;unlocker_proxy_url:{unlocker_proxy_url};unlocker_proxy_login:{unlocker_proxy_login};unlocker_proxy_password:{unlocker_proxy_password};default_proxy_url:{default_proxy_url};default_proxy_login:{default_proxy_login};default_proxy_password:{default_proxy_password}")
-        
+        raise ToolError(f"Proxy configuration parameters cannot be empty, note: unlocker and proxy accounts are not interchangeable;")
     thor_mcp_html = ""
     thor_mcp_isCatch=False # Default cache disabled, cache is only for debugging use, as feedback on AI is unstable
     if thor_mcp_isCatch:
@@ -499,8 +465,7 @@ if __name__ == "__main__":  # If current script is the main program entry
         max_age=86400,  # Preflight request cache time (seconds)
     )
 
-    app = SmitheryConfigMiddleware(app)  
-
+    app = SmitheryConfigMiddleware(app, set_api_key)
     # Use PORT environment variable
     port = int(os.environ.get("PORT", 8081))  # Get port number from environment variable, default to 8081
 

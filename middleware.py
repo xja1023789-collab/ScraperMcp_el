@@ -3,8 +3,9 @@ import base64
 from urllib.parse import parse_qs, unquote
 
 class SmitheryConfigMiddleware:
-    def __init__(self, app):
+    def __init__(self, app,set_api_key):
         self.app = app
+        self.set_api_key = set_api_key 
 
     async def __call__(self, scope, receive, send):
         if scope.get('type') == 'http':
@@ -17,26 +18,12 @@ class SmitheryConfigMiddleware:
                     config = json.loads(base64.b64decode(config_b64))
                     print(f"config2: {config}")
                     
-                    # Inject full config into request scope for per-request access
-                    scope['smithery_config'] = config
+                    self.set_api_key(config)
                 except Exception as e:
                     print(f"SmitheryConfigMiddleware: Error parsing config: {e}")
-                    scope['smithery_config'] = {}
+                    config=None
+                    self.set_api_key(config)
             else:
-                scope['smithery_config'] = {}
+                    self.set_api_key(config)
         
         await self.app(scope, receive, send)  
-# from smithery.utils.config import parse_config_from_asgi_scope
-
-# class SmitheryConfigMiddleware:
-#     def __init__(self, app):
-#         self.app = app
-
-#     async def __call__(self, scope, receive, send):
-#         if scope.get('type') == 'http':
-#             try:
-#                 scope['smithery_config'] = parse_config_from_asgi_scope(scope)
-#             except Exception as e:
-#                 print(f"SmitheryConfigMiddleware: Error parsing config: {e}")
-#                 scope['smithery_config'] = {}
-#         await self.app(scope, receive, send)
